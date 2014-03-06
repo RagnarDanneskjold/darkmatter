@@ -1,9 +1,12 @@
 package me.opsec.darkmatter;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.Notification.Builder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 
 public class DarkService extends IntentService {
 
@@ -19,6 +22,8 @@ public class DarkService extends IntentService {
     public static final String EXTRA_MOUNT_PATH = "mount.path";
 
     private static final String MOUNT_POINT = "/mnt/extSdCard";
+
+    private static final int NOTIFICATION_ID = 42;
 
     public DarkService() {
         super("Dark Matter");
@@ -50,11 +55,13 @@ public class DarkService extends IntentService {
 
     public void create(String volumePath /* full path from root */, int size, String pass1,
             String pass2) {
-
+        startForeground();
+        SystemClock.sleep(5000);
     }
 
     public void open(String volumePath) {
-
+        startForeground();
+        SystemClock.sleep(5000);
     }
 
     public void close(String mountPath) {
@@ -63,6 +70,15 @@ public class DarkService extends IntentService {
 
     public void delete(String volumePath) {
 
+    }
+
+    private void startForeground() {
+        Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("Dark Matter");
+        builder.setContentText("Processing...");
+        builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim);
+        Notification notification = builder.build();
+        startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
