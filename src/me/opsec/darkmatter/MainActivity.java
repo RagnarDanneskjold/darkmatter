@@ -62,6 +62,7 @@ public class MainActivity extends Activity {
             delete();
             break;
         }
+        finish();
     }
 
     private void create() {
