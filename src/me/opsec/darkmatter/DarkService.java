@@ -43,8 +43,8 @@ public class DarkService extends IntentService {
             String mountPath = extras.getString(EXTRA_MOUNT_PATH);
             close(mountPath);
         } else if (ACTION_DELETE.equals(action)) {
-            String mountPath = extras.getString(EXTRA_MOUNT_PATH);
-            close(mountPath);
+            String volumePath = extras.getString(EXTRA_VOLUME_PATH);
+            delete(volumePath);
         }
     }
 
