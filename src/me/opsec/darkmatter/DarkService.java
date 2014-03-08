@@ -1,5 +1,7 @@
 package me.opsec.darkmatter;
 
+import java.util.List;
+
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -7,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
+import eu.chainfire.libsuperuser.Shell;
 
 public class DarkService extends IntentService {
 
@@ -57,6 +60,12 @@ public class DarkService extends IntentService {
             String pass2) {
         startForeground();
         SystemClock.sleep(5000);
+
+        // Example how to execute command that does not require root
+        List<String> result = Shell.SH.run("ls -l /");
+
+        // Example how to execute command that requires root
+        result = Shell.SU.run("ls -l /");
     }
 
     public void open(String volumePath) {

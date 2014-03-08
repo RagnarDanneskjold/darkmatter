@@ -9,7 +9,12 @@
         android:minSdkVersion="17"
         android:targetSdkVersion="18" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+ 
     <application
+        android:name="eu.chainfire.libsuperuser.Application"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -39,11 +44,19 @@
                 <action android:name="android.app.action.ACTION_PASSWORD_FAILED"></action>
             </intent-filter>
         </receiver>
-        
-        <service android:exported="false" android:name="DarkService">
+
+        <receiver android:name="BootCompleteReceiver">
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
-        </service>
+        </receiver>
+        
+        <receiver android:name="TimeoutHandler" />
+        
+        <service
+            android:name="DarkService"
+            android:exported="false" />
     </application>
 
 </manifest>
