@@ -1,4 +1,4 @@
-package me.opsec.darkmatter;
+package me.opsec.darkmatter.receiver;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;

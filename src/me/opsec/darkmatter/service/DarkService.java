@@ -1,4 +1,4 @@
-package me.opsec.darkmatter;
+package me.opsec.darkmatter.service;
 
 import java.util.List;
 

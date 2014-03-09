@@ -1,5 +1,6 @@
 package me.opsec.darkmatter;
 
+import me.opsec.darkmatter.service.DarkService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

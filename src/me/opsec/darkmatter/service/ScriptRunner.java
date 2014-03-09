@@ -1,4 +1,4 @@
-package me.opsec.darkmatter;
+package me.opsec.darkmatter.service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+
+import me.opsec.darkmatter.R;
+import me.opsec.darkmatter.R.raw;
 
 import android.content.Context;
 import android.util.Log;

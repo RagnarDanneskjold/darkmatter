@@ -1,4 +1,4 @@
-package me.opsec.darkmatter;
+package me.opsec.darkmatter.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
