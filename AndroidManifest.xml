@@ -34,7 +34,7 @@
         </activity>
         
         <receiver
-            android:name="AdminReceiver"
+            android:name=".receiver.AdminReceiver"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data android:name="android.app.device_admin"
@@ -45,17 +45,17 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="BootCompleteReceiver">
+        <receiver android:name=".receiver.BootCompleteReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
         
-        <receiver android:name="TimeoutHandler" />
+        <receiver android:name=".receiver.TimeoutHandler" />
         
         <service
-            android:name="DarkService"
+            android:name=".service.DarkService"
             android:exported="false" />
     </application>
 
