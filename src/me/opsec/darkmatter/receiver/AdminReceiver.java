@@ -1,12 +1,11 @@
 package me.opsec.darkmatter.receiver;
 
+import me.opsec.darkmatter.service.DarkService;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-
-//import dev.ukanth.ufirewall.RootShell.RootCommand
 
 /**
  * The receiver of admin events.
@@ -34,14 +33,17 @@ public class AdminReceiver extends DeviceAdminReceiver {
     // return context.getString(R.string.admin_receiver_status_disable_warning);
     // }
 
-    // @Override
-    // public void onPasswordFailed(Context context, Intent intent) {
-    // XXX: set this to send an intent to the DarkService -> "PASSWORD_FAIL"
-    // ScriptRunner.startScript(context);
-    // }
-    
-    // @Override
-    // public void onPasswordSuccess(Context context, Intent intent) {
-    // XXX: set this to send an intent to the DarkService -> "PASSWORD_SUCCESS"
-    // }
+    @Override
+    public void onPasswordFailed(Context context, Intent intent) {
+        intent = new Intent(context, DarkService.class);
+        intent.setAction(DarkService.ACTION_PASSWORD_FAIL);
+        context.startService(intent);
+    }
+
+    @Override
+    public void onPasswordSucceeded(Context context, Intent intent) {
+        intent = new Intent(context, DarkService.class);
+        intent.setAction(DarkService.ACTION_PASSWORD_SUCCESS);
+        context.startService(intent);
+    }
 }
