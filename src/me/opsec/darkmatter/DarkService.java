@@ -28,6 +28,10 @@ public class DarkService extends IntentService {
 
     private static final int NOTIFICATION_ID = 42;
 
+    { // Static initialization
+        initEnvironment();
+    }
+
     public DarkService() {
         super("Dark Matter");
     }
@@ -56,24 +60,22 @@ public class DarkService extends IntentService {
         }
     }
 
-    private void initEnvironment(void) {
-    	// check to see if we have files installed already, if so, return
-    	// if (File.open("bin/script.sh").access()) { return; }
-    	
-    	// no files, ok, lets install:
-    	//   copy script to "bin/", set permissions to the permission value
-    	// install_script_to_bin("script.sh", "bin/script.sh", "0755");
-    	// install_script_to_bin("tcplay", "bin/tcplay", "0755");
-    	// install_script_to_bin("tc.sh", "bin/tc.sh", "0755");
+    private void initEnvironment() {
+        // check to see if we have files installed already, if so, return
+        // if (File.open("bin/script.sh").access()) { return; }
 
-    	// return 
+        // no files, ok, lets install:
+        // copy script to "bin/", set permissions to the permission value
+        // install_script_to_bin("script.sh", "bin/script.sh", "0755");
+        // install_script_to_bin("tcplay", "bin/tcplay", "0755");
+        // install_script_to_bin("tc.sh", "bin/tc.sh", "0755");
     }
+
     public void create(String volumePath /* full path from root */, int size, String pass1,
             String pass2) {
         startForeground();
         SystemClock.sleep(5000);
 
-        
         // Example how to execute command that does not require root
         List<String> result = Shell.SH.run("ls -l /");
 
