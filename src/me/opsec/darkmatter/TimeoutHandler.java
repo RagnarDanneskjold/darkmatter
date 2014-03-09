@@ -23,5 +23,6 @@ public class TimeoutHandler extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: Code to run after X hours of inactivity
+    	// XXX: send Intent.TIMEOUT_ALERT ? the DarkService will handle everything
     }
 }
