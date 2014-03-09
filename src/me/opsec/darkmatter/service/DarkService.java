@@ -52,6 +52,11 @@ public class DarkService extends IntentService {
 
     public DarkService() {
         super("Dark Matter");
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
         mStorage = new DarkStorage();
         mRatchet = new SecurityRatchet(mStorage);
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -95,7 +100,7 @@ public class DarkService extends IntentService {
 
     }
 
-    private void initEnvironment() {
+    private static void initEnvironment() {
         // check to see if we have files installed already, if so, return
         // if (File.open("bin/script.sh").access()) { return; }
 
