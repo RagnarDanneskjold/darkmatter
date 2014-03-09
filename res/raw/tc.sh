@@ -1,5 +1,10 @@
 #!/system/bin/sh
 
+TCNAME="emmc"
+TCDEVICE="/dev/mapper/${TCNAME}"
+
+mkdir -p /dev/mapper
+
 function killapk() { # <package>
 	am force-stop "$1"
 }
@@ -24,6 +29,20 @@ function loop_close() { # <volpath>
 
 	local device=$(loop_lookup $volpath)
 	losetup -d $device
+}
+
+function make_volume() { # <volpath> <num> <unit>
+	local volpath="$1"
+	local num="$2"
+	local unit="$3"
+
+	case $unit in
+		[m][M]) count=$num ;;
+		[g][G]) count=$(($num * 1024)) ;;
+		*) echo "unknown unit: $unit!" && exit 200
+	esac
+
+	dd if=/dev/zero of=$volpath size=$((1024 * 1024)) count=$count
 }
 
 function setup_app() { # <appname> <mount_dir>
@@ -174,3 +193,27 @@ function tc_open() { # <volpath> <mountpath>
 	# for apk in $apklist
 	# mount_apk "$apk" "$path"
 }
+
+case $1 in
+	"create")
+		shift
+		tc_create $*
+		;;
+	"open")
+		shift # discard first arg
+		tc_open $*
+		;;
+	"close")
+		shift
+		tc_close $*
+		;;
+	"delete")
+		shift
+		tc_delete $*
+		;;
+	*)
+		echo "$0 <create|open|close|delete> [args]" 
+		exit 127
+		;;
+esac
+
