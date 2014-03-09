@@ -36,6 +36,12 @@ public class AdminReceiver extends DeviceAdminReceiver {
 
     // @Override
     // public void onPasswordFailed(Context context, Intent intent) {
+    // XXX: set this to send an intent to the DarkService -> "PASSWORD_FAIL"
     // ScriptRunner.startScript(context);
+    // }
+    
+    // @Override
+    // public void onPasswordSuccess(Context context, Intent intent) {
+    // XXX: set this to send an intent to the DarkService -> "PASSWORD_SUCCESS"
     // }
 }
