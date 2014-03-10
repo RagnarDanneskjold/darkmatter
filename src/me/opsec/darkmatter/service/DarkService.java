@@ -1,7 +1,16 @@
 package me.opsec.darkmatter.service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.List;
 
+import me.opsec.darkmatter.R;
 import me.opsec.darkmatter.receiver.TimeoutHandler;
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -12,11 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Service for dispatching events in a background thread.
  */
 public class DarkService extends IntentService {
+
+    public static final String TAG = "DarkService";
 
     public static final String ACTION_CREATE = "create";
     public static final String ACTION_OPEN = "open";
@@ -46,9 +58,7 @@ public class DarkService extends IntentService {
     private AlarmManager mAlarmManager;
     private PendingIntent mTimeoutIntent;
 
-    { // Static initialization
-        initEnvironment();
-    }
+    private String mBinDirectory;
 
     public DarkService() {
         super("Dark Matter");
@@ -60,6 +70,7 @@ public class DarkService extends IntentService {
         mStorage = new DarkStorage();
         mRatchet = new SecurityRatchet(mStorage);
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        initEnvironment();
     }
 
     @Override
@@ -100,15 +111,64 @@ public class DarkService extends IntentService {
 
     }
 
-    private static void initEnvironment() {
-        // check to see if we have files installed already, if so, return
-        // if (File.open("bin/script.sh").access()) { return; }
+    private void initEnvironment() {
+        // Return if files installed already
+        // TODO: Should it be "/bin" or "/data/data/me.opsec.darkmatter/bin"?
+        mBinDirectory = getFilesDir() + "/bin";
+        File script = new File(mBinDirectory, "script.sh");
+        if (script.exists()) {
+            return;
+        }
 
-        // no files, ok, lets install:
-        // copy script to "bin/", set permissions to the permission value
-        // install_script_to_bin("script.sh", "bin/script.sh", "0755");
-        // install_script_to_bin("tcplay", "bin/tcplay", "0755");
-        // install_script_to_bin("tc.sh", "bin/tc.sh", "0755");
+        // Create bin directory
+        new File(mBinDirectory).mkdirs();
+
+        // copy scripts to "bin/" and set permissions to run them
+        copyScriptToBin(R.raw.script, "script.sh");
+        copyScriptToBin(R.raw.tcplay, "tcplay");
+        copyScriptToBin(R.raw.tc, "tc.sh");
+    }
+
+    private void copyScriptToBin(int resId, String filename) {
+        try {
+            File destFile = new File(mBinDirectory, filename);
+            InputStream in = getResources().openRawResource(resId);
+            OutputStream out = new FileOutputStream(destFile);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+
+            // Set execute permission
+            String scriptPath = destFile.getAbsolutePath();
+            exec(Arrays.asList("/system/xbin/chmod", "0755", scriptPath)); // TODO: Why not "0700"?
+        } catch (FileNotFoundException e) {
+            Log.w(TAG, "Cannot open file for writing", e);
+        } catch (IOException e) {
+            Log.w(TAG, "Error writing script file", e);
+        }
+    }
+
+    private static boolean exec(List<String> command) {
+        Process process = null;
+        try {
+            process = new ProcessBuilder().command(command).redirectErrorStream(true).start();
+            process.waitFor();
+            Log.i(TAG, "Command completed");
+            return true;
+        } catch (IOException e) {
+            Log.w(TAG, "Error running command: " + command, e);
+        } catch (InterruptedException e) {
+            Log.w(TAG, "Command interrupted: " + command, e);
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+        return false;
     }
 
     private void restartTimeout() {
