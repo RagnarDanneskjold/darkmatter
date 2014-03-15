@@ -172,7 +172,7 @@ public class DarkService extends IntentService {
     }
 
     private void restartTimeout() {
-        // TODO: Make configurable?
+        // TODO: Make configurable? XXX: yes.
         long time = new GregorianCalendar().getTimeInMillis() + 12 * HOUR;
 
         Intent intent = new Intent(this, TimeoutHandler.class);

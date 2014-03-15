@@ -31,6 +31,6 @@ public class SecurityRatchet {
         } else if (mLevel == 1) {
             Shell.SH.run("bin/ratchet");
             mStorage.close("mountPath"); // TODO: Get mount path from parameter or settings
-        }
+        } // XXX BUG, if the mLevel is > 1, then no action is taken. Is it possible we can enter that state?
     }
 }

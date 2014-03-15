@@ -31,7 +31,7 @@ function loop_close() { # <volpath>
 	losetup -d $device
 }
 
-function make_volume() { # <volpath> <num> <unit>
+function volume_create() { # <volpath> <num> <unit>
 	local volpath="$1"
 	local num="$2"
 	local unit="$3"
@@ -43,6 +43,12 @@ function make_volume() { # <volpath> <num> <unit>
 	esac
 
 	dd if=/dev/zero of=$volpath size=$((1024 * 1024)) count=$count
+}
+
+function volume_delete() { # <volpath>
+	local volpath="$1"
+	# dd if=/dev/zero of=$volpath count=4096
+	rm $volpath
 }
 
 function setup_app() { # <appname> <mount_dir>
@@ -75,9 +81,9 @@ function tc_mount() { # <volpath> <mountpath>
 		local device=$(loop_open $volpath)
 	fi
 
-	tcplay -d $device --map "emmc"
+	tcplay -d $device --map $TCNAME
 
-	mount -o "noatime,nodev" -t ext4 /dev/mapper/emmc $target
+	mount -o "noatime,nodev" -t ext4 $TCDEVICE $target
 }
 
 function tc_unmount() { # <volpath>
@@ -86,12 +92,12 @@ function tc_unmount() { # <volpath>
 	local device=$(loop_lookup $volpath)
 
 	for i in "1" "2"; do
-		local mounts=$(grep "/dev/mapper/emmc" /proc/mounts | cut -d ' ' -f 2)
+		local mounts=$(grep "$TCDEVICE" /proc/mounts | cut -d ' ' -f 2)
 		for m in $mounts; do
 			umount $m
 		done
 
-		tcplay -d $device --unmap "emmc"
+		tcplay -d $device --unmap $TCNAME
 		if [ $? -eq 0 ]; then
 			return 0
 		fi
@@ -115,10 +121,10 @@ function tc_create() { # <volpath> <size> <pass1> <pass2>
 	#   send hidden_size
 	#   send "y"
 
-	tcplay -d $device --map "emmc"
+	tcplay -d $device --map $TCNAME
 	#  send password
-	mkfs.ext2 -O ^has_journal "/dev/mapper/emmc"
-	tcplay -d $device --unmap "emmc"
+	mkfs.ext2 -O ^has_journal $TCDEVICE
+	tcplay -d $device --unmap $TCNAME
 
 	# mount decoy
 		# mkfs.ext4
@@ -174,11 +180,10 @@ function tc_open() { # <volpath> <mountpath>
         local device=$(losetup -f)
         losetup "$device" "$volume"
 
-        local name="emmc"
 
         # decrypt the volume
         # tcplay -d <volume> -m <name>
-        tcplay -d $device -m $name
+        tcplay -d $device -m $TCNAME
 	# send password???
 
 	if [ ! -d "$path" ]; then
@@ -188,7 +193,7 @@ function tc_open() { # <volpath> <mountpath>
 	fi
 
         # mount </dev/mapper/name> <path>
-	mount -o noatime "/dev/mapper/$name" "$path"
+	mount -o noatime $TCDEVICE "$path"
 
 	# for apk in $apklist
 	# mount_apk "$apk" "$path"
