@@ -89,11 +89,13 @@ public class DarkService extends IntentService {
         } else if (ACTION_OPEN.equals(action)) {
             startForeground();
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            mStorage.open(volumePath);
+            String mountPath = extras.getString(EXTRA_MOUNT_PATH);
+            String passwd = extras.getString(EXTRA_PASS_1);
+            mStorage.open(volumePath, mountPath, passwd);
             restartTimeout(); // TODO: Only restart the timeout if password successful
         } else if (ACTION_CLOSE.equals(action)) {
-            String mountPath = extras.getString(EXTRA_MOUNT_PATH);
-            mStorage.close(mountPath);
+            String volumePath = extras.getString(EXTRA_VOLUME_PATH);
+            mStorage.close(volumePath);
         } else if (ACTION_DELETE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.delete(volumePath);
