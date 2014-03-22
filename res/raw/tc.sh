@@ -106,6 +106,8 @@ function tc_unmount() { # <volpath>
 			return 0
 		fi
 	done
+	
+	losetup -d $device
 }
 
 function tc_map() { # <device> <name> <password>
