@@ -60,6 +60,7 @@ public class DarkStorage {
     private List<String> suRun(Context context, String format, Object... args) {
         String binDir = context.getFilesDir() + "/bin/";
         String command = binDir + String.format(format, args);
+        "PATH=/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:%s",binDir)
         return Shell.SU.run(command);
     }
 }
