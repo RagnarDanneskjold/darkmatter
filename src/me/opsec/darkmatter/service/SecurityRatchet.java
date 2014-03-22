@@ -2,7 +2,6 @@ package me.opsec.darkmatter.service;
 
 import eu.chainfire.libsuperuser.Shell;
 
-
 /**
  * Various security hardening.
  */
@@ -31,7 +30,8 @@ public class SecurityRatchet {
             return;
         } else if (mLevel == 1) {
             Shell.SH.run("bin/ratchet");
-            mStorage.close("mountPath"); // TODO: Get mount path from parameter or settings
-        } // XXX BUG, if the mLevel is > 1, then no action is taken. Is it possible we can enter that state?
+            // TODO: Use context instead of null
+            mStorage.close(null, "mountPath"); // TODO: Get mount path from parameter or settings
+        }
     }
 }

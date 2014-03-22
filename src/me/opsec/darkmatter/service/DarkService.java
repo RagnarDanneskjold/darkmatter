@@ -96,7 +96,7 @@ public class DarkService extends IntentService {
             restartTimeout(); // TODO: Only restart the timeout if password successful
         } else if (ACTION_CLOSE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            mStorage.close(volumePath);
+            mStorage.close(this, volumePath);
         } else if (ACTION_DELETE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.delete(this, volumePath);
@@ -129,7 +129,7 @@ public class DarkService extends IntentService {
         // copy scripts to "bin/" and set permissions to run them
         copyScriptToBin(R.raw.script, "script.sh");
         copyScriptToBin(R.raw.tcplay, "tcplay");
-        copyScriptToBin(R.raw.tc, "tc.sh");
+        copyScriptToBin(R.raw.tc, "tc");
     }
 
     private void copyScriptToBin(int resId, String filename) {

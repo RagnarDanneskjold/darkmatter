@@ -25,8 +25,8 @@ public class DarkStorage {
     public void create(Context context, String volumePath, int size1, int size2, String pass1,
             String pass2) {
 
-        List<String> result = suRun("tc create %s %s %s %s %s", volumePath, size1, size2, pass1,
-                pass2);
+        List<String> result = suRun(context, "tc create %s %s %s %s %s", volumePath, size1, size2,
+                pass1, pass2);
 
         SystemClock.sleep(2000); // TODO: Remove
 
@@ -36,7 +36,7 @@ public class DarkStorage {
     }
 
     public void open(Context context, String volumePath, String mountPath, String passwd) {
-        List<String> result = suRun("tc open %s %s %s", volumePath, mountPath, passwd);
+        List<String> result = suRun(context, "tc open %s %s %s", volumePath, mountPath, passwd);
 
         SystemClock.sleep(2000); // TODO: Remove
 
@@ -46,19 +46,20 @@ public class DarkStorage {
         }
     }
 
-    public void close(String volumePath) {
-        List<String> result = suRun("tc close %s", volumePath);
+    public void close(Context context, String volumePath) {
+        List<String> result = suRun(context, "tc close %s", volumePath);
     }
 
     public void delete(Context context, String volumePath) {
-        List<String> result = suRun("tc delete %s", volumePath);
+        List<String> result = suRun(context, "tc delete %s", volumePath);
         if (result == null) {
             Application.toast(context, String.format("Error deleting: %s.", volumePath));
         }
     }
 
-    private List<String> suRun(String format, Object... args) {
-        String command = String.format(format, args);
+    private List<String> suRun(Context context, String format, Object... args) {
+        String binDir = context.getFilesDir() + "/bin/";
+        String command = binDir + String.format(format, args);
         return Shell.SU.run(command);
     }
 }
