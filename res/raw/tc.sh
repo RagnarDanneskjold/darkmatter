@@ -104,36 +104,61 @@ function tc_unmount() { # <volpath>
 	done
 }
 
+function tc_map() { # <device> <name> <password>
+        local device="$1"
+        local name="$2"
+        local password="$3"
+        (echo $password; sleep 1) | (tcplay -d $device --map $name) >&2
+}
+
 function tc_create() { # <volpath> <size> <pass1> <pass2>
 	local volpath="$1"
 	local size="$2"
-	local pass1="$3"
-	local pass2="$4"
+	local hiddensz="$3"M
+	local pass1="$4"
+	local pass2="$5"
 
-	# dd create .. blocksize is 512
+	# dd /dev/zero, volpath, num_mb, "M" (or 'G' for num_gb)
+	volume_create "$volpath" "$size" "M"
 	# loop mount
+	local device=$(loop_open "$volpath")
 
 	local DEBUG="-z -w"
-	# tcplay create
-	tcplay -d $device --create --hidden --cipher=AES-256-XTS $DEBUG
-	#   send password, send password
-	#   send hiddenp, send hiddenp
-	#   send hidden_size
-	#   send "y"
+        # tcplay create
+        (
+                echo $pass1
+                sleep 1
+                echo $pass1
+                sleep 1
+                echo $pass2
+                sleep 1
+                echo $pass2
+                sleep 1
+                echo "$hiddensz"M
+                sleep 1
+                echo "y"
+        ) | (tcplay -d $device --create --hidden --cipher=AES-256-XTS $DEBUG) >&2
 
-	tcplay -d $device --map $TCNAME
-	#  send password
-	mkfs.ext2 -O ^has_journal $TCDEVICE
-	tcplay -d $device --unmap $TCNAME
+        #   send password, send password
+        #   send hiddenp, send hiddenp
+        #   send hidden_size
+        #   send "y"
 
-	# mount decoy
-		# mkfs.ext4
-		# mkdir
-	# umount decoy
-	# mount real
-		# mkfs.ext4
-		# mkdir
-	# umount real
+        # mount real
+                # mkfs.ext4
+                # mkdir
+        # umount real
+        tc_map "$device" "$TCNAME" "$pass1"
+        mkfs.ext2 -O ^has_journal $TCDEVICE
+        tcplay -d $device --unmap $TCNAME
+
+        # mount decoy
+                # mkfs.ext4
+                # mkdir
+		# umount decoy
+		tc_map "$device" "$TCNAME" "$pass1"
+        mkfs.ext2 -O ^has_journal $TCDEVICE
+        tcplay -d $device --unmap $TCNAME
 }
 
 function get_app_user() {
@@ -197,6 +222,14 @@ function tc_open() { # <volpath> <mountpath>
 
 	# for apk in $apklist
 	# mount_apk "$apk" "$path"
+}
+
+function tc_close() { # <volpath>
+        local volpath="$1"
+
+        # killapps
+
+        tc_unmount $volpath
 }
 
 case $1 in
