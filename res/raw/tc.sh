@@ -159,6 +159,8 @@ function tc_create() { # <volpath> <size> <pass1> <pass2>
 		tc_map "$device" "$TCNAME" "$pass1"
         mkfs.ext2 -O ^has_journal $TCDEVICE
         tcplay -d $device --unmap $TCNAME
+        
+        losetup -d $device
 }
 
 function get_app_user() {
