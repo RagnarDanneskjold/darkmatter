@@ -2,7 +2,9 @@ package me.opsec.darkmatter.service;
 
 import java.util.List;
 
+import android.content.Context;
 import android.os.SystemClock;
+import eu.chainfire.libsuperuser.Application;
 import eu.chainfire.libsuperuser.Shell;
 
 /**
@@ -10,40 +12,53 @@ import eu.chainfire.libsuperuser.Shell;
  */
 public class DarkStorage {
 
-    public void create(String volumePath /* full path from root */, int size, String pass1,
+    /**
+     * @param context
+     * @param volumePath
+     *            full path from root
+     * @param mountPath
+     * @param size
+     *            in megabytes
+     * @param pass1
+     * @param pass2
+     */
+    public void create(Context context, String volumePath, int size1, int size2, String pass1,
             String pass2) {
-    	proc = runProcess("tc create %s %s", volumePath, mountPath);
-    	proc.write("%s", pass1);
-    	proc.write("%s", pass2);
-    	
-    	if (proc.exit_value() != 0) {
-    		alert_user("failed to create volume: %s", volumePath);
-    	}
-        // TODO: Implement
-        SystemClock.sleep(5000);
 
-        // Example how to execute command that does not require root
-        List<String> result = Shell.SH.run("ls -l /");
+        List<String> result = suRun("tc create %s %s %s %s %s", volumePath, size1, size2, pass1,
+                pass2);
 
-        // Example how to execute command that requires root
-        result = Shell.SU.run("ls -l /");
+        SystemClock.sleep(2000); // TODO: Remove
+
+        if (result == null) {
+            Application.toast(context, String.format("Failed to create volume: %s", volumePath));
+        }
     }
 
-    public void open(String volumePath, String mountPath, string passwd) {
-        // TODO: Implement
-    	proc = runProcess("tc open %s %s", volumePath, mountPath);
-    	proc.write("%s", string);
-    	if (proc.exit_value() != 0) {
-    		alert_user("Error opening: %s. Incorrect password?", volumePath);
-    	}
-        SystemClock.sleep(5000);
+    public void open(Context context, String volumePath, String mountPath, String passwd) {
+        List<String> result = suRun("tc open %s %s %s", volumePath, mountPath, passwd);
+
+        SystemClock.sleep(2000); // TODO: Remove
+
+        if (result == null) {
+            Application.toast(context,
+                    String.format("Error opening: %s. Incorrect password?", volumePath));
+        }
     }
 
     public void close(String volumePath) {
-    	Shell.SH.run("tc close %s", volumePath);
+        List<String> result = suRun("tc close %s", volumePath);
     }
 
-    public void delete(String volumePath) {
-    	Shell.SH.run("tc delete %s", volumePath);
+    public void delete(Context context, String volumePath) {
+        List<String> result = suRun("tc delete %s", volumePath);
+        if (result == null) {
+            Application.toast(context, String.format("Error deleting: %s.", volumePath));
+        }
+    }
+
+    private List<String> suRun(String format, Object... args) {
+        String command = String.format(format, args);
+        return Shell.SU.run(command);
     }
 }

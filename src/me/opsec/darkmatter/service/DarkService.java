@@ -40,12 +40,12 @@ public class DarkService extends IntentService {
     public static final String ACTION_REBOOTED = "rebooted";
 
     public static final String EXTRA_VOLUME_PATH = "volume.path";
-    public static final String EXTRA_SIZE = "size";
+    public static final String EXTRA_SIZE1 = "size1";
+    public static final String EXTRA_SIZE2 = "size2";
     public static final String EXTRA_PASS_1 = "pass1";
     public static final String EXTRA_PASS_2 = "pass2";
+    public static final String EXTRA_PASS = "pass";
     public static final String EXTRA_MOUNT_PATH = "mount.path";
-
-    private static final String MOUNT_POINT = "/mnt/extSdCard";
 
     private static final int NOTIFICATION_ID = 42;
 
@@ -82,23 +82,24 @@ public class DarkService extends IntentService {
         if (ACTION_CREATE.equals(action)) {
             startForeground();
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            int size = extras.getInt(EXTRA_SIZE);
+            int size1 = extras.getInt(EXTRA_SIZE1);
+            int size2 = extras.getInt(EXTRA_SIZE2);
             String pass1 = extras.getString(EXTRA_PASS_1);
             String pass2 = extras.getString(EXTRA_PASS_2);
-            mStorage.create(volumePath, size, pass1, pass2);
+            mStorage.create(this, volumePath, size1, size2, pass1, pass2);
         } else if (ACTION_OPEN.equals(action)) {
             startForeground();
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             String mountPath = extras.getString(EXTRA_MOUNT_PATH);
-            String passwd = extras.getString(EXTRA_PASS_1);
-            mStorage.open(volumePath, mountPath, passwd);
+            String passwd = extras.getString(EXTRA_PASS);
+            mStorage.open(this, volumePath, mountPath, passwd);
             restartTimeout(); // TODO: Only restart the timeout if password successful
         } else if (ACTION_CLOSE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.close(volumePath);
         } else if (ACTION_DELETE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            mStorage.delete(volumePath);
+            mStorage.delete(this, volumePath);
         } else if (ACTION_REBOOTED.equals(action)) {
             mRatchet.increase(); // TODO: Verify that this is correct
         } else if (ACTION_TIMEOUT.equals(action)) {
