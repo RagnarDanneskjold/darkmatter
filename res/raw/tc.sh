@@ -37,8 +37,10 @@ function volume_create() { # <volpath> <num> <unit>
 	local unit="$3"
 
 	case $unit in
-		[m][M]) count=$num ;;
-		[g][G]) count=$(($num * 1024)) ;;
+		m) count=$num ;;
+		M) count=$num ;;
+		g) count=$(($num * 1024)) ;;
+		G) count=$(($num * 1024)) ;;
 		*) echo "unknown unit: $unit!" && exit 200
 	esac
 
