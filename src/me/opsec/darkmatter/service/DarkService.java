@@ -67,7 +67,7 @@ public class DarkService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mStorage = new DarkStorage();
+        mStorage = new DarkStorage(this);
         mRatchet = new SecurityRatchet(mStorage);
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         initEnvironment();
@@ -86,20 +86,18 @@ public class DarkService extends IntentService {
             int size2 = extras.getInt(EXTRA_SIZE2);
             String pass1 = extras.getString(EXTRA_PASS_1);
             String pass2 = extras.getString(EXTRA_PASS_2);
-            mStorage.create(this, volumePath, size1, size2, pass1, pass2);
+            mStorage.create(volumePath, size1, size2, pass1, pass2);
         } else if (ACTION_OPEN.equals(action)) {
             startForeground();
-            String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             String mountPath = extras.getString(EXTRA_MOUNT_PATH);
             String passwd = extras.getString(EXTRA_PASS);
-            mStorage.open(this, volumePath, mountPath, passwd);
+            mStorage.open(mountPath, passwd);
             restartTimeout(); // TODO: Move to ratchet
         } else if (ACTION_CLOSE.equals(action)) {
-            String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            mStorage.close(this, volumePath);
+            mStorage.close();
         } else if (ACTION_DELETE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
-            mStorage.delete(this, volumePath);
+            mStorage.delete();
         } else if (ACTION_REBOOTED.equals(action)) {
             mRatchet.increase();
         } else if (ACTION_TIMEOUT.equals(action)) {

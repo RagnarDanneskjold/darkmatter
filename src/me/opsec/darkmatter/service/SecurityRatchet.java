@@ -30,8 +30,7 @@ public class SecurityRatchet {
             return;
         } else if (mLevel == 1) {
             Shell.SH.run("bin/ratchet");
-            // TODO: Use context instead of null
-            mStorage.close(null, "mountPath"); // TODO: Get mount path from parameter or settings
+            mStorage.close();
         }
     }
 }

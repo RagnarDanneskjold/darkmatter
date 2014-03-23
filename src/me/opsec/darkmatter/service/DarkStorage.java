@@ -3,7 +3,6 @@ package me.opsec.darkmatter.service;
 import java.util.List;
 
 import android.content.Context;
-import android.os.SystemClock;
 import eu.chainfire.libsuperuser.Application;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -11,6 +10,13 @@ import eu.chainfire.libsuperuser.Shell;
  * Secure storage using TrueCrypt.
  */
 public class DarkStorage {
+
+    private Context mAppContext;
+
+    public DarkStorage(Context context) {
+        super();
+        mAppContext = context.getApplicationContext();
+    }
 
     /**
      * @param context
@@ -22,46 +28,45 @@ public class DarkStorage {
      * @param pass1
      * @param pass2
      */
-    public void create(Context context, String volumePath, int size1, int size2, String pass1,
-            String pass2) {
+    public void create(String volumePath, int size1, int size2, String pass1, String pass2) {
 
-        List<String> result = suRun(context, "tc create %s %s %s %s %s", volumePath, size1, size2,
-                pass1, pass2);
-
-        SystemClock.sleep(2000); // TODO: Remove
+        List<String> result = suRun("tc create %s %s %s %s %s", volumePath, size1, size2, pass1,
+                pass2);
 
         if (result == null) {
-            Application.toast(context, String.format("Failed to create volume: %s", volumePath));
+            Application
+                    .toast(mAppContext, String.format("Failed to create volume: %s", volumePath));
         }
     }
 
-    public void open(Context context, String volumePath, String mountPath, String passwd) {
-        List<String> result = suRun(context, "tc open %s %s %s", volumePath, mountPath, passwd);
-
-        SystemClock.sleep(2000); // TODO: Remove
+    public void open(String mountPath, String passwd) {
+        String volumePath = mAppContext.getFilesDir() + "/volume.dat";
+        List<String> result = suRun("tc open %s %s %s", volumePath, mountPath, passwd);
 
         if (result == null) {
-            Application.toast(context,
+            Application.toast(mAppContext,
                     String.format("Error opening: %s. Incorrect password?", volumePath));
         }
     }
 
-    public void close(Context context, String volumePath) {
-        List<String> result = suRun(context, "tc close %s", volumePath);
+    public void close() {
+        // TODO: Get mount path from parameter or settings
+        List<String> result = suRun("tc close %s", mAppContext.getFilesDir() + "/volume.dat");
     }
 
-    public void delete(Context context, String volumePath) {
-        List<String> result = suRun(context, "tc delete %s", volumePath);
+    public void delete() {
+        String volumePath = mAppContext.getFilesDir() + "/volume.dat";
+        List<String> result = suRun("tc delete %s", volumePath);
         if (result == null) {
-            Application.toast(context, String.format("Error deleting: %s.", volumePath));
+            Application.toast(mAppContext, String.format("Error deleting: %s.", volumePath));
         }
     }
 
-    private List<String> suRun(Context context, String format, Object... args) {
-        String binDir = context.getFilesDir() + "/bin/";
+    private List<String> suRun(String format, Object... args) {
+        String binDir = mAppContext.getFilesDir() + "/bin/";
         String command = binDir + String.format(format, args);
-        String[] environment = new String[] { "PATH=/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:"
-                + binDir };
-        return Shell.run("su", new String[] { command }, null, false);
+        // String[] environment = new String[] { "PATH=/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:"
+        // + binDir };
+        return Shell.SU.run(command);
     }
 }

@@ -80,7 +80,6 @@ public class MainActivity extends Activity {
     private void open() {
         Intent intent = new Intent(this, DarkService.class);
         intent.setAction(DarkService.ACTION_OPEN);
-        intent.putExtra(DarkService.EXTRA_VOLUME_PATH, getFilesDir() + "/volume.dat");
         intent.putExtra(DarkService.EXTRA_MOUNT_PATH, "/mnt/extSdCard");
         intent.putExtra(DarkService.EXTRA_PASS, "pass1");
         startService(intent);
@@ -89,14 +88,12 @@ public class MainActivity extends Activity {
     private void close() {
         Intent intent = new Intent(this, DarkService.class);
         intent.setAction(DarkService.ACTION_CLOSE);
-        intent.putExtra(DarkService.EXTRA_VOLUME_PATH, getFilesDir() + "/volume.dat");
         startService(intent);
     }
 
     private void delete() {
         Intent intent = new Intent(this, DarkService.class);
         intent.setAction(DarkService.ACTION_DELETE);
-        intent.putExtra(DarkService.EXTRA_VOLUME_PATH, getFilesDir() + "/volume.dat");
         startService(intent);
     }
 }
