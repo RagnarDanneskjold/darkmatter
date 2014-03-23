@@ -93,7 +93,7 @@ public class DarkService extends IntentService {
             String mountPath = extras.getString(EXTRA_MOUNT_PATH);
             String passwd = extras.getString(EXTRA_PASS);
             mStorage.open(this, volumePath, mountPath, passwd);
-            restartTimeout(); // TODO: Only restart the timeout if password successful
+            restartTimeout(); // TODO: Move to ratchet
         } else if (ACTION_CLOSE.equals(action)) {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.close(this, volumePath);
@@ -101,7 +101,7 @@ public class DarkService extends IntentService {
             String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.delete(this, volumePath);
         } else if (ACTION_REBOOTED.equals(action)) {
-            mRatchet.increase(); // TODO: Verify that this is correct
+            mRatchet.increase();
         } else if (ACTION_TIMEOUT.equals(action)) {
             mRatchet.increase();
         } else if (ACTION_PASSWORD_FAIL.equals(action)) {
@@ -116,7 +116,6 @@ public class DarkService extends IntentService {
 
     private void initEnvironment() {
         // Return if files installed already
-        // TODO: Should it be "/bin" or "/data/data/me.opsec.darkmatter/bin"?
         mBinDirectory = getFilesDir() + "/bin";
         File script = new File(mBinDirectory, "script.sh");
         if (script.exists()) {
@@ -147,7 +146,7 @@ public class DarkService extends IntentService {
 
             // Set execute permission
             String scriptPath = destFile.getAbsolutePath();
-            exec(Arrays.asList("/system/xbin/chmod", "0755", scriptPath)); // TODO: Why not "0700"?
+            exec(Arrays.asList("/system/xbin/chmod", "0700", scriptPath));
         } catch (FileNotFoundException e) {
             Log.w(TAG, "Cannot open file for writing", e);
         } catch (IOException e) {
