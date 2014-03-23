@@ -3,6 +3,8 @@
 TCNAME="emmc"
 TCDEVICE="/dev/mapper/${TCNAME}"
 
+PATH=${PATH}:$(dirname $0)
+
 mkdir -p /dev/mapper
 
 function killapk() { # <package>
@@ -44,7 +46,7 @@ function volume_create() { # <volpath> <num> <unit>
 		*) echo "unknown unit: $unit!" && exit 200
 	esac
 
-	dd if=/dev/zero of=$volpath size=$((1024 * 1024)) count=$count
+	dd if=/dev/zero of=$volpath bs=$((1024 * 1024)) count=$count
 }
 
 function volume_delete() { # <volpath>
@@ -104,6 +106,8 @@ function tc_unmount() { # <volpath>
 			return 0
 		fi
 	done
+	
+	losetup -d $device
 }
 
 function tc_map() { # <device> <name> <password>
@@ -136,7 +140,7 @@ function tc_create() { # <volpath> <size> <pass1> <pass2>
                 sleep 1
                 echo $pass2
                 sleep 1
-                echo "$hiddensz"M
+                echo $hiddensz
                 sleep 1
                 echo "y"
         ) | (tcplay -d $device --create --hidden --cipher=AES-256-XTS $DEBUG) >&2
