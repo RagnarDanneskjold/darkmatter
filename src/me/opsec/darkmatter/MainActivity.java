@@ -78,11 +78,8 @@ public class MainActivity extends Activity {
     }
 
     private void open() {
-        Intent intent = new Intent(this, DarkService.class);
-        intent.setAction(DarkService.ACTION_OPEN);
-        intent.putExtra(DarkService.EXTRA_MOUNT_PATH, "/mnt/extSdCard");
-        intent.putExtra(DarkService.EXTRA_PASS, "pass1");
-        startService(intent);
+        Intent intent = new Intent(this, OpenActivity.class);
+        startActivity(intent);
     }
 
     private void close() {

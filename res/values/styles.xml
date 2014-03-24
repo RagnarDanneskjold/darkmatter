@@ -1,8 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-    </style>
-    
+    <style name="AppTheme" parent="android:Theme.Holo"></style>
+
     <style name="NoBackground" parent="android:Theme.Holo">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
@@ -11,4 +11,11 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowNoDisplay">true</item>
     </style>
+
+    <style name="OpenFormContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
 </resources>

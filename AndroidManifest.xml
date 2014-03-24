@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.opsec.darkmatter"
+    android:installLocation="internalOnly"
     android:versionCode="1"
-    android:versionName="0.1"
-    android:installLocation="internalOnly" >
+    android:versionName="0.1" >
 
     <uses-sdk
         android:minSdkVersion="17"
@@ -11,53 +11,61 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
- 
+
     <application
         android:name="eu.chainfire.libsuperuser.Application"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <activity
-            android:name="MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/NoBackground"
+            android:name="me.opsec.darkmatter.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
-            android:noHistory="true" >
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:theme="@style/NoBackground" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <receiver
-            android:name=".receiver.AdminReceiver"
+            android:name="me.opsec.darkmatter.receiver.AdminReceiver"
             android:label="@string/app_name"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data android:name="android.app.device_admin"
-                    android:resource="@xml/device_admin" />
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-                <action android:name="android.app.action.ACTION_PASSWORD_FAILED"></action>
+                <action android:name="android.app.action.ACTION_PASSWORD_FAILED" >
+                </action>
             </intent-filter>
         </receiver>
-
-        <receiver android:name=".receiver.BootCompleteReceiver">
+        <receiver android:name="me.opsec.darkmatter.receiver.BootCompleteReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
-        
-        <receiver android:name=".receiver.TimeoutHandler" />
-        
+        <receiver android:name="me.opsec.darkmatter.receiver.TimeoutHandler" />
+
         <service
-            android:name=".service.DarkService"
+            android:name="me.opsec.darkmatter.service.DarkService"
             android:exported="false" />
+
+        <activity
+            android:name="me.opsec.darkmatter.OpenActivity"
+            android:label="@string/title_activity_open"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
     </application>
 
 </manifest>
