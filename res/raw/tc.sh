@@ -2,14 +2,14 @@
 
 TCNAME="emmc"
 TCDEVICE="/dev/mapper/${TCNAME}"
+APPLIST=""
 
 PATH=${PATH}:$(dirname $0)
 
 mkdir -p /dev/mapper
+mkdir -p /sdcard/Android/data
 
-function killapk() { # <package>
-	am force-stop "$1"
-}
+
 
 function loop_open() { # <volpath>
 	local volpath="$1"
@@ -22,7 +22,7 @@ function loop_open() { # <volpath>
 function loop_lookup() { # <volpath>
 	local volpath="$1"
 
-	local device=$(losetup| grep $volpath | cut -d' ' -f 3)
+	local device=$(losetup| grep $volpath | head -1| sed -e 's/:.*$//')
 	echo "$device"
 }
 
@@ -51,8 +51,22 @@ function volume_create() { # <volpath> <num> <unit>
 
 function volume_delete() { # <volpath>
 	local volpath="$1"
-	# dd if=/dev/zero of=$volpath count=4096
-	rm $volpath
+	# offset: 0
+	# offset: (volume_size)-BACKUP_HDR_OFFSET
+	# offset: HIDDEN_HDR_OFFSET
+	#define HDR_OFFSET_HIDDEN	65536
+	#define BACKUP_HDR_HIDDEN_OFFSET_END	65536
+	#define BACKUP_HDR_OFFSET_END	131072
+	
+	local volsize=$(ls -l "$volpath"| cut -d' ' -f 12)
+	# wipe hidden header
+	dd if=/dev/zero of="$volpath" bs=512 count=1 seek=65536
+	# wipe real header
+	dd if=/dev/zero of="$volpath" bs=512 count=1 seek=0
+	# wipe backup header
+	dd if=/dev/zero of="$volpath" bs=512 count=1 seek=$(($volsize - 131072))
+
+	rm -f $volpath
 }
 
 function setup_app() { # <appname> <mount_dir>
@@ -63,51 +77,51 @@ function setup_app() { # <appname> <mount_dir>
                 mkdir -p "$tcdir/Android/data"
         fi
 
-        if [ ! -d $tcdir/data ]; then
+        if [ ! -d "$tcdir/data" ]; then
                 mkdir -p "$tcdir/data"
         fi
 
         local user=`get_app_user $appname`
 
-        mkdir -p "$tcdir/Android/data/$appname"
-        chown $user:$user "$tcdir/Android/data/$appname"
-
-        mkdir -p "$tcdir/data/$appname"
-        chown $user:$user "$tcdir/data/$appname"
-}
-
-function tc_mount() { # <volpath> <mountpath>
-	local volpath="$1"
-	local target="$2"
-
-	local device=$(loop_lookup $volpath)
-	if [ -z $device ]; then
-		local device=$(loop_open $volpath)
+        if [ ! -d "$tcdir/Android/data/$appname" ]; then
+        	mkdir -p "$tcdir/Android/data/$appname"
+        	chown $user:$user "$tcdir/Android/data/$appname"
 	fi
 
-	tcplay -d $device --map $TCNAME
+        if [ ! -d "$tcdir/data/$appname" ]; then
+        	mkdir -p "$tcdir/data/$appname"
+        	chown $user:$user "$tcdir/data/$appname"
+	fi
+}
 
-	mount -o "noatime,nodev" -t ext4 $TCDEVICE $target
+# the device must already be mapped onto a /dev/mapper/$NAME
+function tc_mount() { # <tcdevice> <mountpath>
+	local tcdevice="$1"
+	local path="$2"
+	
+	if [ ! -d "$path" ]; then
+		mount -o remount,rw /
+		mkdir -p "$path"
+		mount -o remount,ro /
+	fi
+	
+	mount -o "noatime,nodev" -t ext4 $tcdevice $path
 }
 
 function tc_unmount() { # <volpath>
 	local volpath="$1"
 
+	local retries="2"
+
 	local device=$(loop_lookup $volpath)
 
-	for i in "1" "2"; do
+	# $(seq $retries)
+	for i in $(seq $retries); do
 		local mounts=$(grep "$TCDEVICE" /proc/mounts | cut -d ' ' -f 2)
 		for m in $mounts; do
 			umount $m
 		done
-
-		tcplay -d $device --unmap $TCNAME
-		if [ $? -eq 0 ]; then
-			return 0
-		fi
 	done
-	
-	losetup -d $device
 }
 
 function tc_map() { # <device> <name> <password>
@@ -117,7 +131,35 @@ function tc_map() { # <device> <name> <password>
         (echo $password; sleep 1) | (tcplay -d $device --map $name) >&2
 }
 
-function tc_create() { # <volpath> <size> <pass1> <pass2>
+function tc_unmap() { # <device> <name>
+	local device="$1"
+	local name="$2"
+	
+	tcplay -d $device --unmap $name
+}
+
+function tc_init_device() { # <device> <target> <password>
+	local device="$1"
+	local target="$2"
+	local password="$3"
+
+	if [ ! -d "$target" ]; then
+		mount -o rw,remount /
+		mkdir -p $target
+		mount -o ro,remount /
+	fi
+
+        tc_map "$device" "$TCNAME" "$password"
+        mkfs.ext2 -O ^has_journal $TCDEVICE
+	mount -o "noatime,nodev" -t ext4 $TCDEVICE "$target"
+	for appname in $APPNAMES; do
+		setup_app "$appname" "$target"
+	done
+	umount "$target"
+	tc_unmap "$device" "$TCNAME"
+}
+
+function tc_create() { # <volpath> <size> <hiddensz> <pass1> <pass2>
 	local volpath="$1"
 	local size="$2"
 	local hiddensz="$3"M
@@ -150,21 +192,10 @@ function tc_create() { # <volpath> <size> <pass1> <pass2>
         #   send hidden_size
         #   send "y"
 
-        # mount real
-                # mkfs.ext4
-                # mkdir
-        # umount real
-        tc_map "$device" "$TCNAME" "$pass1"
-        mkfs.ext2 -O ^has_journal $TCDEVICE
-        tcplay -d $device --unmap $TCNAME
+	local target="/mnt/extSdCard"
 
-        # mount decoy
-                # mkfs.ext4
-                # mkdir
-		# umount decoy
-		tc_map "$device" "$TCNAME" "$pass1"
-        mkfs.ext2 -O ^has_journal $TCDEVICE
-        tcplay -d $device --unmap $TCNAME
+	tc_init_device "$device" "$target" "$pass1"
+	tc_init_device "$device" "$target" "$pass2"
         
         losetup -d $device
 }
@@ -174,70 +205,69 @@ function get_app_user() {
 }
 
 function bind_mount() { # <from> <dest> <user>
-        local from="$1"
-        local dest="$2"
-        local user="$3"
+	local from="$1"
+	local dest="$2"
+	local user="$3"
 
-        local m=$(grep "$dest" /proc/mounts| wc -l)
-        if [ $m -ne 0 ]; then
+	local m=$(grep "$dest" /proc/mounts| wc -l)
+	if [ $m -ne 0 ]; then
                 return 1
-        fi
-
-        mount -o bind,user=$user,relatime,nodev $from $dest
-        return $?
-}
-
-function mount_app() { # <app_name> <mount_path>
-        local appname="$1"
-	local tcdir="$2"
-        local user=`get_app_user $appname`
-
-        # make sure nothing is open on our target directory. maybe
-	killapk $appname >/dev/null 2>/dev/null
-        killall $appname >/dev/null 2>/dev/null
-
-        local datadir="/data/data"
-
-	mkdir -p /sdcard/Android/data >/dev/null 2>/dev/null
-
-        bind_mount "$tcdir/data/$appname" "/data/data/$appname" "$user"
-        bind_mount "$tcdir/Android/data/$appname" "/sdcard/Android/data/$appname" "$user"
-}
-
-function tc_open() { # <volpath> <mountpath> 
-        local volume="$1"
-        local path="$2"
-        local password="$3"
-
-        # create loopback device
-        local device=$(losetup -f)
-        losetup "$device" "$volume"
-
-
-        # decrypt the volume
-        # tcplay -d <volume> -m <name>
-        tcplay -d $device -m $TCNAME
-	# send password???
-
-	if [ ! -d "$path" ]; then
-		mount -o remount,rw /
-		mkdir -p "$path"
-		mount -o remount,ro /
 	fi
 
-        # mount </dev/mapper/name> <path>
-	mount -o noatime $TCDEVICE "$path"
+	mount -o bind,user=$user,relatime,nodev $from $dest
+	return $?
+}
 
-	# for apk in $apklist
-	# mount_apk "$apk" "$path"
+function app_mount() { # <app_name> <mount_path>
+	local appname="$1"
+	local tcdir="$2"
+	local user=`get_app_user $appname`
+
+	# make sure nothing is open on our target directory. maybe
+	killall $appname >/dev/null 2>/dev/null
+
+	bind_mount "$tcdir/data/$appname" "/data/data/$appname" "$user"
+	bind_mount "$tcdir/Android/data/$appname" "/sdcard/Android/data/$appname" "$user"
+}
+
+function app_kill() { # <package>
+	am force-stop "$1"
+}
+
+function tc_open() { # <volpath> <mountpath> <password>
+	local volume="$1"
+	local path="$2"
+	local password="$3"
+
+	local device=$(loop_open "$volume")
+
+	tc_map "$device" "$TCNAME" "$password"
+	tc_mount "$TCDEVICE" "$path"
+		
+	for app in $APPLIST; do
+		app_kill "$app"
+		app_mount "$app" "$path"
+	done
 }
 
 function tc_close() { # <volpath>
-        local volpath="$1"
+	local volpath="$1"
+	local device=$(loop_lookup "$volpath")
 
-        # killapps
+	for app in $APPLIST; do
+		app_kill "$app"
+		app_umount "$app" "$path"
+	done
 
-        tc_unmount $volpath
+	tc_unmount "$volpath"
+	tc_unmap "$device" "$TCNAME"
+	loop_close "$volpath"
+}
+
+function tc_delete() { # <volpath>
+	local volpath="$1"
+
+	volume_delete "$volpath"
 }
 
 case $1 in
