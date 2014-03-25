@@ -1,16 +1,30 @@
 <resources>
 
+    
+    <!-- Strings related to create -->
+    <string name="title_activity_create">Create TrueCrypt Volume</string>
+    <string name="prompt_volume_path">Volume path</string>
+    <string name="prompt_volume_size">Volume size (default 2048)</string>
+    <string name="prompt_hidden_size">Hidden size (default 1024)</string>
+    <string name="prompt_password1">Outer password</string>
+    <string name="prompt_password1_confirm">Confirm outer password</string>
+    <string name="prompt_password2">Hidden password</string>
+    <string name="prompt_password2_confirm">Confirm hidden password</string>
+    <string name="action_create_volume">Create volume</string>
+    <string name="progress_creating">Creating volume&#8230;</string>
+    <string name="error_volume_size_must_be_larger">Volume size must be larger than hidden size</string>
+    <string name="error_passwords_must_not_be_the_same">Passwords for outer and hidden must not be the same</string>
+    
+    <!-- Strings related to open -->
     <string name="title_activity_open">Open TrueCrypt Volume</string>
-
-    <!-- Strings related to login -->
     <string name="prompt_password">Password</string>
     <string name="action_open_volume">Open volume</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="action_forgot_password">Recover lost password</string>
-    <string name="login_progress_signing_in">Opening&#8230;</string>
-    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="progress_opening">Opening&#8230;</string>
+
+    <!-- Common dialog strings -->
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_password_mismatch">Password mismatch</string>
     <string name="error_field_required">This field is required</string>
-
+    
 </resources>

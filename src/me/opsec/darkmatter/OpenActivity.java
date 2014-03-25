@@ -26,7 +26,7 @@ public class OpenActivity extends Activity {
 
     private EditText mPasswordView;
     private View mLoginFormView;
-    private View mLoginStatusView;
+    private View mOpenStatusView;
     private TextView mLoginStatusMessageView;
 
     @Override
@@ -48,10 +48,10 @@ public class OpenActivity extends Activity {
         });
 
         mLoginFormView = findViewById(R.id.login_form);
-        mLoginStatusView = findViewById(R.id.login_status);
-        mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
+        mOpenStatusView = findViewById(R.id.open_status);
+        mLoginStatusMessageView = (TextView) findViewById(R.id.status_message);
 
-        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.open_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
@@ -76,15 +76,12 @@ public class OpenActivity extends Activity {
         if (TextUtils.isEmpty(mPassword)) {
             mPasswordView.setError(getString(R.string.error_field_required));
             cancel = true;
-        } else if (mPassword.length() < 4) { // TODO: Any length limitation like this?
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            cancel = true;
         }
 
         if (cancel) {
             mPasswordView.requestFocus();
         } else {
-            mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
+            mLoginStatusMessageView.setText(R.string.progress_opening);
             showProgress(true);
             Intent intent = new Intent(this, DarkService.class);
             intent.setAction(DarkService.ACTION_OPEN);
@@ -106,12 +103,12 @@ public class OpenActivity extends Activity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginStatusView.setVisibility(View.VISIBLE);
-            mLoginStatusView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0)
+            mOpenStatusView.setVisibility(View.VISIBLE);
+            mOpenStatusView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            mLoginStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
+                            mOpenStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
                         }
                     });
 
@@ -126,7 +123,7 @@ public class OpenActivity extends Activity {
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            mLoginStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mOpenStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }

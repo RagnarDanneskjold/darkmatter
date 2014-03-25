@@ -34,6 +34,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="me.opsec.darkmatter.CreateActivity"
+            android:label="@string/title_activity_create"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
+        <activity
             android:name="me.opsec.darkmatter.OpenActivity"
             android:label="@string/title_activity_open"
             android:windowSoftInputMode="adjustResize|stateVisible" >
