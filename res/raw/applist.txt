@@ -1,0 +1,10 @@
+org.whispersystems.whisperpush
+org.torproject.android
+at.quadrat.android.r2mail2
+com.twofours.surespot
+de.blinkt.openvpn
+info.guardianproject.otr.app.im
+net.i2p.android.router
+net.openvpn.openvpn
+org.thoughtcrime.redphone
+org.thoughtcrime.textsecure
