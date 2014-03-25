@@ -38,6 +38,7 @@ public class DarkService extends IntentService {
     public static final String ACTION_PASSWORD_SUCCESS = "success";
     public static final String ACTION_TIMEOUT = "timeout";
     public static final String ACTION_REBOOTED = "rebooted";
+    public static final String ACTION_RADIO_LOST = "radio.lost";
 
     public static final String EXTRA_VOLUME_PATH = "volume.path";
     public static final String EXTRA_SIZE1 = "size1";
