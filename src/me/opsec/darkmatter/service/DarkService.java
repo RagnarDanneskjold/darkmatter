@@ -128,6 +128,8 @@ public class DarkService extends IntentService {
         copyScriptToBin(R.raw.script, "script.sh");
         copyScriptToBin(R.raw.tcplay, "tcplay");
         copyScriptToBin(R.raw.tc, "tc");
+        copyScriptToBin(R.raw.ratchet, "ratchet");
+        copyScriptToBin(R.raw.smem, "smem");
     }
 
     private void copyScriptToBin(int resId, String filename) {
