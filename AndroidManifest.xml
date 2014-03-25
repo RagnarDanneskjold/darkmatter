@@ -33,7 +33,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name="me.opsec.darkmatter.OpenActivity"
+            android:label="@string/title_activity_open"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
+        
         <receiver
             android:name="me.opsec.darkmatter.receiver.AdminReceiver"
             android:label="@string/app_name"
@@ -56,16 +61,11 @@
             </intent-filter>
         </receiver>
         <receiver android:name="me.opsec.darkmatter.receiver.TimeoutHandler" />
-
+        
         <service
             android:name="me.opsec.darkmatter.service.DarkService"
             android:exported="false" />
 
-        <activity
-            android:name="me.opsec.darkmatter.OpenActivity"
-            android:label="@string/title_activity_open"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
     </application>
 
 </manifest>
