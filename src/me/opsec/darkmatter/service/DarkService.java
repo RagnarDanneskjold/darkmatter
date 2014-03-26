@@ -97,7 +97,6 @@ public class DarkService extends IntentService {
         } else if (ACTION_CLOSE.equals(action)) {
             mStorage.close();
         } else if (ACTION_DELETE.equals(action)) {
-            String volumePath = extras.getString(EXTRA_VOLUME_PATH);
             mStorage.delete();
         } else if (ACTION_REBOOTED.equals(action)) {
             mRatchet.increase();
