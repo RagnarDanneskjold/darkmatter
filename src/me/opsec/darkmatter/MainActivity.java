@@ -1,6 +1,7 @@
 package me.opsec.darkmatter;
 
 import me.opsec.darkmatter.service.DarkService;
+import me.opsec.darkmatter.service.DarkStorage;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -16,7 +17,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        showDialog();
+        DarkStorage storage = new DarkStorage(this);
+
+        if (!storage.isCreated()) {
+            create();
+        } else if (!storage.isOpen()) {
+            open();
+        } else {
+            showDialog();
+        }
     }
 
     private void showDialog() {
@@ -51,15 +60,9 @@ public class MainActivity extends Activity {
     protected void onListItemClick(int item) {
         switch (item) {
         case 0:
-            create();
-            break;
-        case 1:
-            open();
-            break;
-        case 2:
             close();
             break;
-        case 3:
+        case 1:
             delete();
             break;
         }

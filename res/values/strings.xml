@@ -5,8 +5,6 @@
     <string name="policy_enabled">Enabled</string>
 
     <string-array name="actions">
-        <item>Create</item>
-        <item>Open</item>
         <item>Close</item>
         <item>Delete</item>
     </string-array>
