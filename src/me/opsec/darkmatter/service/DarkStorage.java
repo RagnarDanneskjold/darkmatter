@@ -61,12 +61,12 @@ public class DarkStorage {
         }
     }
 
-    public void open(String mountPath, String passwd) {
+    public boolean open(String mountPath, String passwd) {
         String volumePath = getVolumePath();
         if (volumePath == null) {
             Application.toast(mAppContext,
                     String.format("Internal error. Volume path not set %s", volumePath));
-            return;
+            return false;
         }
 
         List<String> result = suRun("tc open %s %s %s", volumePath, mountPath, passwd);
@@ -74,9 +74,11 @@ public class DarkStorage {
         if (result == null) {
             Application.toast(mAppContext,
                     String.format("Error opening: %s. Incorrect password?", volumePath));
-        } else {
-            mPreferences.edit().putString(PREF_MOUNT_PATH, mountPath).commit();
+            return false;
         }
+
+        mPreferences.edit().putString(PREF_MOUNT_PATH, mountPath).commit();
+        return true;
     }
 
     public void close() {

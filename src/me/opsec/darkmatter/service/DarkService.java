@@ -7,17 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import me.opsec.darkmatter.R;
-import me.opsec.darkmatter.receiver.TimeoutHandler;
-import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.Notification.Builder;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -50,14 +45,8 @@ public class DarkService extends IntentService {
 
     private static final int NOTIFICATION_ID = 42;
 
-    private static final int TIMEOUT_REQUEST_ID = 42;
-    private static final int HOUR = 60 * 60 * 1000;
-
     private DarkStorage mStorage;
     private SecurityRatchet mRatchet;
-
-    private AlarmManager mAlarmManager;
-    private PendingIntent mTimeoutIntent;
 
     private String mBinDirectory;
 
@@ -69,8 +58,7 @@ public class DarkService extends IntentService {
     public void onCreate() {
         super.onCreate();
         mStorage = new DarkStorage(this);
-        mRatchet = new SecurityRatchet(mStorage);
-        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        mRatchet = new SecurityRatchet(this, mStorage);
         initEnvironment();
     }
 
@@ -92,8 +80,9 @@ public class DarkService extends IntentService {
             startForeground();
             String mountPath = extras.getString(EXTRA_MOUNT_PATH);
             String passwd = extras.getString(EXTRA_PASS);
-            mStorage.open(mountPath, passwd);
-            restartTimeout(); // TODO: Move to ratchet
+            if (mStorage.open(mountPath, passwd)) {
+                mRatchet.reset();
+            }
         } else if (ACTION_CLOSE.equals(action)) {
             mStorage.close();
         } else if (ACTION_DELETE.equals(action)) {
@@ -104,10 +93,8 @@ public class DarkService extends IntentService {
             mRatchet.increase();
         } else if (ACTION_PASSWORD_FAIL.equals(action)) {
             mRatchet.increase();
-            clearTimeout();
         } else if (ACTION_PASSWORD_SUCCESS.equals(action)) {
             mRatchet.reset();
-            restartTimeout();
         }
 
     }
@@ -171,20 +158,6 @@ public class DarkService extends IntentService {
             }
         }
         return false;
-    }
-
-    private void restartTimeout() {
-        // TODO: Make configurable? XXX: yes.
-        long time = new GregorianCalendar().getTimeInMillis() + 12 * HOUR;
-
-        Intent intent = new Intent(this, TimeoutHandler.class);
-        mTimeoutIntent = PendingIntent.getBroadcast(this, TIMEOUT_REQUEST_ID, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, time, mTimeoutIntent);
-    }
-
-    private void clearTimeout() {
-        mAlarmManager.cancel(mTimeoutIntent);
     }
 
     private void startForeground() {
