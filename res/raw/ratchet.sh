@@ -1,10 +1,18 @@
 #!/system/bin/sh
 
 PATH=$(dirname $0):$PATH
+APPLIST=(org.whispersystems.whisperpush
+org.torproject.android
+at.rundquadrat.android.r2mail2
+com.twofours.surespot
+de.blinkt.openvpn
+info.guardianproject.otr.app.im
+net.i2p.android.router
+net.openvpn.openvpn
+org.thoughtcrime.redphone
+org.thoughtcrime.textsecure
+)
 
-function app_get_list() { #
-	cat "$(dirname 0)/applist"
-}
 
 function app_kill() { # <apk.name>
 	am force-stop "$1"
@@ -12,7 +20,7 @@ function app_kill() { # <apk.name>
 }
 
 function app_kill_all() { #
-	for app in `app_get_list` ; do
+	for app in ${APPLIST[*]}; do
 		app_kill "$app"
 	done
 }
@@ -22,5 +30,10 @@ function mem_wiper() {
 	# wipe cache?
 }
 
-app_kill_all
-mem_wiper
+function slam_closed() {
+	app_kill_all
+	./tc close "volume.dat"
+	mem_wiper
+}
+
+slam_closed
