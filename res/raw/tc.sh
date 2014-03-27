@@ -308,6 +308,7 @@ case $1 in
 	"open")
 		shift # discard first arg
 		tc_open $*
+		exit 0
 		;;
 	"close")
 		shift
