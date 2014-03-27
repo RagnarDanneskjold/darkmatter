@@ -40,60 +40,25 @@ public class CreateActivity extends Activity {
         setContentView(R.layout.activity_create);
 
         mPassword1View = (EditText) findViewById(R.id.password1);
-        mPassword1View.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptCreateVolume();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         mPassword1ConfirmView = (EditText) findViewById(R.id.password1_confirm);
-        mPassword1ConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptCreateVolume();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         mPassword2View = (EditText) findViewById(R.id.password2);
-        mPassword2View.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptCreateVolume();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         mPassword2ConfirmView = (EditText) findViewById(R.id.password2_confirm);
-        mPassword2ConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptCreateVolume();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         mVolumeSizeView = (EditText) findViewById(R.id.volume_size);
         mHiddenSizeView = (EditText) findViewById(R.id.hidden_size);
-
         mVolumePathView = (EditText) findViewById(R.id.volume_path);
         if (mVolumePathView.getText().toString().length() == 0) {
             mVolumePathView.setText("volume.dat");
         }
+        mVolumePathView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                    attemptCreateVolume();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mCreateStatusView = findViewById(R.id.create_status);
