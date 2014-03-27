@@ -1,6 +1,5 @@
 <resources>
 
-    
     <!-- Strings related to create -->
     <string name="title_activity_create">Create TrueCrypt Volume</string>
     <string name="prompt_volume_path">Volume path</string>
@@ -14,11 +13,12 @@
     <string name="progress_creating">Creating volume&#8230;</string>
     <string name="error_volume_size_must_be_larger">Volume size must be larger than hidden size</string>
     <string name="error_passwords_must_not_be_the_same">Passwords for outer and hidden must not be the same</string>
-    
+
     <!-- Strings related to open -->
     <string name="title_activity_open">Open TrueCrypt Volume</string>
     <string name="prompt_password">Password</string>
     <string name="action_open_volume">Open</string>
+    <string name="action_delete_volume">Delete volume</string>
     <string name="progress_opening">Opening&#8230;</string>
 
     <!-- Common dialog strings -->
@@ -26,5 +26,5 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_password_mismatch">Password mismatch</string>
     <string name="error_field_required">This field is required</string>
-    
+
 </resources>
