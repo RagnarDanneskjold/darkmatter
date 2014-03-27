@@ -97,6 +97,13 @@ public class DarkService extends IntentService {
             mRatchet.reset();
         }
 
+        startRadioMonitor();
+    }
+
+    private void startRadioMonitor() {
+        Intent intent = new Intent(this, RadioMonitor.class);
+        intent.setAction(DarkService.ACTION_REBOOTED);
+        startService(intent);
     }
 
     private void initEnvironment() {

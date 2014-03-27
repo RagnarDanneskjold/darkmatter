@@ -17,7 +17,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         DarkStorage storage = new DarkStorage(this);
+
+        // Make sure the services are started
+        Intent intent = new Intent(this, DarkService.class);
+        startService(intent);
 
         if (!storage.isCreated()) {
             create();
