@@ -2,14 +2,24 @@
 
 TCNAME="emmc"
 TCDEVICE="/dev/mapper/${TCNAME}"
-APPLIST=""
+APPLIST=(org.whispersystems.whisperpush
+org.torproject.android
+at.rundquadrat.android.r2mail2
+com.twofours.surespot
+de.blinkt.openvpn
+info.guardianproject.otr.app.im
+net.i2p.android.router
+net.openvpn.openvpn
+org.thoughtcrime.redphone
+org.thoughtcrime.textsecure
+)
 
 PATH=${PATH}:$(dirname $0)
 
+umask 022
+
 mkdir -p /dev/mapper
 mkdir -p /sdcard/Android/data
-
-
 
 function loop_open() { # <volpath>
 	local volpath="$1"
@@ -124,11 +134,17 @@ function tc_unmount() { # <volpath>
 	done
 }
 
-function tc_map() { # <device> <name> <password>
+function tc_map() { # <device> <name> <password> [<hidden>]
         local device="$1"
         local name="$2"
         local password="$3"
-        (echo $password; sleep 1) | (tcplay -d $device --map $name) >&2
+	local hidden="$4"
+
+	if [ -z $hidden ]; then
+        	(echo $password; sleep 1) | (tcplay -d $device --map $name) >&2
+	else
+		(echo $password; sleep 1; echo $hidden; sleep 1) | (tcplay -d $device --map $name -e) >&2
+	fi
 }
 
 function tc_unmap() { # <device> <name>
@@ -138,10 +154,11 @@ function tc_unmap() { # <device> <name>
 	tcplay -d $device --unmap $name
 }
 
-function tc_init_device() { # <device> <target> <password>
+function tc_init_device() { # <device> <target> <password> [<hidden>]
 	local device="$1"
 	local target="$2"
 	local password="$3"
+	local hidden="$4"
 
 	if [ ! -d "$target" ]; then
 		mount -o rw,remount /
@@ -149,10 +166,14 @@ function tc_init_device() { # <device> <target> <password>
 		mount -o ro,remount /
 	fi
 
-        tc_map "$device" "$TCNAME" "$password"
+        tc_map "$device" "$TCNAME" "$password" $hidden
         mkfs.ext2 -O ^has_journal $TCDEVICE
 	mount -o "noatime,nodev" -t ext4 $TCDEVICE "$target"
-	for appname in $APPNAMES; do
+	mkdir -p "$target/data" 
+	mkdir -p "$target/Android/data"
+	chmod 0755 "$target/data"
+	chmod 0755 "$target/Android/data"
+	for appname in ${APPLIST[*]}; do
 		setup_app "$appname" "$target"
 	done
 	umount "$target"
@@ -194,8 +215,8 @@ function tc_create() { # <volpath> <size> <hiddensz> <pass1> <pass2>
 
 	local target="/mnt/extSdCard"
 
-	tc_init_device "$device" "$target" "$pass1"
 	tc_init_device "$device" "$target" "$pass2"
+	tc_init_device "$device" "$target" "$pass1" "$pass2"
         
         losetup -d $device
 }
@@ -230,6 +251,15 @@ function app_mount() { # <app_name> <mount_path>
 	bind_mount "$tcdir/Android/data/$appname" "/sdcard/Android/data/$appname" "$user"
 }
 
+function app_umount() { # <app_name>
+	local appname="$1"
+	
+	killall $appname >/dev/null 2>/dev/null
+
+	umount "/data/data/$appname"
+	umount "/sdcard/Android/data/$appname"
+}
+
 function app_kill() { # <package>
 	am force-stop "$1"
 }
@@ -244,7 +274,7 @@ function tc_open() { # <volpath> <mountpath> <password>
 	tc_map "$device" "$TCNAME" "$password"
 	tc_mount "$TCDEVICE" "$path"
 		
-	for app in $APPLIST; do
+	for app in ${APPLIST[*]}; do
 		app_kill "$app"
 		app_mount "$app" "$path"
 	done
@@ -254,7 +284,7 @@ function tc_close() { # <volpath>
 	local volpath="$1"
 	local device=$(loop_lookup "$volpath")
 
-	for app in $APPLIST; do
+	for app in ${APPLIST[*]}; do
 		app_kill "$app"
 		app_umount "$app" "$path"
 	done
