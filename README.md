@@ -1,26 +1,27 @@
+# DarkMatter
+
 DarkMatter monitors the operational environment, indicative of hostile
 access to the device (or absence of friendly access to the device) and
 sets the device to a more hardened state by killing sensitive applications,
 wiping RAM, unmounting TrueCrypt volume, etc. In addition, the built-in
 security administrator disables the camera and keyguard widgets.
 
-Warning! When building this app, make sure you build a release version.
-Building a debug version will cause libsuperuser to log passwords in 
-clear text.
+Mor information and planned features can be found in the [wiki pages](https://github.com/grugq/darkmatter/wiki/_pages).
 
 ### Setting up DarkMatter in Eclipse
-1. Download and install ADT Bundle (http://developer.android.com/sdk/installing/bundle.html) or install Eclipse/ADT separately
+1. Download and install [ADT Bundle](http://developer.android.com/sdk/installing/bundle.html) or install [Eclipse/ADT](http://developer.android.com/sdk/index.html) separately
 2. Clone DarkMatter to some place (not in your workspace folder)
 3. In Eclipse choose File-menu > Import > Android > Existing Android Code Into Workspace
 4. Browse to the source code folder
 5. Check the box and click Finish
-6. Make step 2-5 for libsuperuser (https://github.com/Chainfire/libsuperuser)
+6. Make step 2-5 for [libsuperuser](https://github.com/Chainfire/libsuperuser)
 
 ### Run the project in debug mode
 1. Right click the project in the Package Explorer and select Run As > Android Application
-The app will be built and signed with your default debug keys. Warning!
-In debug mode libsuperuser will currently log the TrueCrypt passwords and
-other information in clear text.
+The app will be built and signed with your default debug keys.
+
+Warning! In debug mode libsuperuser will currently log the TrueCrypt
+passwords and other information in clear text.
 
 ### Build the release version
 1. In the project menu, uncheck "Build automatically"
