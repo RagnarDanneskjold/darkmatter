@@ -7,4 +7,5 @@ info.guardianproject.otr.app.im
 net.i2p.android.router
 net.openvpn.openvpn
 org.thoughtcrime.redphone
+com.xabber.androiddev
 org.thoughtcrime.textsecure
