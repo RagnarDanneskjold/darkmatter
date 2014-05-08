@@ -12,6 +12,7 @@ net.i2p.android.router
 net.openvpn.openvpn
 org.thoughtcrime.redphone
 org.thoughtcrime.textsecure
+com.xabber.androiddev
 )
 
 PATH=${PATH}:$(dirname $0)
@@ -246,6 +247,10 @@ function app_mount() { # <app_name> <mount_path>
 
 	# make sure nothing is open on our target directory. maybe
 	killall $appname >/dev/null 2>/dev/null
+
+	if [ ! -d "$tcdir/data/$appname" ]; then
+		setup_app "$tcdir" "$appname"
+	fi
 
 	bind_mount "$tcdir/data/$appname" "/data/data/$appname" "$user"
 	bind_mount "$tcdir/Android/data/$appname" "/sdcard/Android/data/$appname" "$user"
