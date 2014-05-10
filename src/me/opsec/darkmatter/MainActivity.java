@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
 
     private void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Dark Matter");
+        builder.setTitle("DarkMatter");
         builder.setOnCancelListener(new OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
