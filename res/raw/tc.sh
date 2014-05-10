@@ -10,6 +10,8 @@ de.blinkt.openvpn
 info.guardianproject.otr.app.im
 net.i2p.android.router
 net.openvpn.openvpn
+org.thialfihar.android.apg
+com.fsck.k9
 org.thoughtcrime.redphone
 org.thoughtcrime.textsecure
 com.xabber.androiddev
