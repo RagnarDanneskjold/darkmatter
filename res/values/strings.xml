@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DarkMatter</string>
+    <string name="app_name">Dark Matter</string>
     <string name="policy_enabled">Enabled</string>
 
     <string-array name="actions">

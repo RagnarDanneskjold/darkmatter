@@ -4,74 +4,38 @@ import me.opsec.darkmatter.service.DarkService;
 import me.opsec.darkmatter.service.DarkStorage;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 public class MainActivity extends Activity {
 
     private AlertDialog mMenu;
-    private DarkStorage mStorage;
-
-    private static final ComponentName LAUNCHER_COMPONENT_NAME = new ComponentName(
-            "me.opsec.darkmatter", "me.opsec.darkmatter.Launcher");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mStorage = new DarkStorage(this);
+        DarkStorage storage = new DarkStorage(this);
 
         // Make sure the services are started
         Intent intent = new Intent(this, DarkService.class);
         startService(intent);
 
-        if (isLauncherIconVisible()) {
-            hideLauncherIcon();
-        } else {
-            showGui();
-        }
-    }
-
-    private void showGui() {
-        if (!mStorage.isCreated()) {
+        if (!storage.isCreated()) {
             create();
-        } else if (!mStorage.isOpen()) {
+        } else if (!storage.isOpen()) {
             open();
         } else {
             showDialog();
         }
     }
 
-    private boolean isLauncherIconVisible() {
-        int enabledSetting = getPackageManager()
-                .getComponentEnabledSetting(LAUNCHER_COMPONENT_NAME);
-        return enabledSetting != PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-    }
-
-    private void hideLauncherIcon() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Important!");
-        builder.setMessage("To launch the app again, dial phone number 12345.");
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                getPackageManager().setComponentEnabledSetting(LAUNCHER_COMPONENT_NAME,
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                        PackageManager.DONT_KILL_APP);
-                showGui();
-            }
-        });
-        builder.setIcon(android.R.drawable.ic_dialog_alert);
-        builder.show();
-    }
-
     private void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("DarkMatter");
+        builder.setTitle("Dark Matter");
         builder.setOnCancelListener(new OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {

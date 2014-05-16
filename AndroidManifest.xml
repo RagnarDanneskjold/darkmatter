@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
 
     <application
         android:name="eu.chainfire.libsuperuser.Application"
@@ -30,34 +29,25 @@
             android:label="@string/app_name"
             android:noHistory="true"
             android:theme="@style/NoBackground" >
-        </activity>
-        <activity-alias
-            android:name=".Launcher" 
-            android:targetActivity="me.opsec.darkmatter.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> 
-        </activity-alias>
+            </intent-filter>
+        </activity>
         <activity
             android:name="me.opsec.darkmatter.CreateActivity"
-            android:excludeFromRecents="true"
             android:label="@string/title_activity_create"
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
             android:name="me.opsec.darkmatter.OpenActivity"
-            android:excludeFromRecents="true"
             android:label="@string/title_activity_open"
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
-
-        <receiver android:name="me.opsec.darkmatter.receiver.LaunchViaDialReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
+        
         <receiver
             android:name="me.opsec.darkmatter.receiver.AdminReceiver"
             android:label="@string/app_name"
@@ -79,13 +69,14 @@
             </intent-filter>
         </receiver>
         <receiver android:name="me.opsec.darkmatter.receiver.TimeoutHandler" />
-
+        
         <service
             android:name="me.opsec.darkmatter.service.DarkService"
             android:exported="false" />
         <service
             android:name="me.opsec.darkmatter.service.RadioMonitor"
             android:exported="false" />
+
     </application>
 
 </manifest>

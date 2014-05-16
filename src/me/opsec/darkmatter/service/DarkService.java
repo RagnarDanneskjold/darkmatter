@@ -52,7 +52,7 @@ public class DarkService extends IntentService {
     private String mBinDirectory;
 
     public DarkService() {
-        super("DarkMatter");
+        super("Dark Matter");
     }
 
     @Override
@@ -172,7 +172,7 @@ public class DarkService extends IntentService {
 
     private void startForeground() {
         Builder builder = new Notification.Builder(this);
-        builder.setContentTitle("DarkMatter");
+        builder.setContentTitle("Dark Matter");
         builder.setContentText("Processing...");
         builder.setSmallIcon(android.R.drawable.stat_notify_sync_noanim);
         Notification notification = builder.build();
