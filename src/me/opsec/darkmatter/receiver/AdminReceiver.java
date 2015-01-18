@@ -17,7 +17,7 @@ public class AdminReceiver extends DeviceAdminReceiver {
         DevicePolicyManager pm = (DevicePolicyManager) context
                 .getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName admin = new ComponentName(context, AdminReceiver.class);
-        pm.setCameraDisabled(admin, true);
+        pm.setCameraDisabled(admin, false); // apparently people like their cameras.
         pm.setKeyguardDisabledFeatures(admin, DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL);
 
         // TODO: Add code like this to start the preferences when enabled

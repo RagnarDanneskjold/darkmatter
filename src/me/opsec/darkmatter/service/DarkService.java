@@ -34,6 +34,7 @@ public class DarkService extends IntentService {
     public static final String ACTION_TIMEOUT = "timeout";
     public static final String ACTION_REBOOTED = "rebooted";
     public static final String ACTION_RADIO_LOST = "radio.lost";
+    public static final String ACTION_SIM_REMOVED = "sim.absent";
 
     public static final String EXTRA_VOLUME_PATH = "volume.path";
     public static final String EXTRA_SIZE1 = "size1";
@@ -90,6 +91,8 @@ public class DarkService extends IntentService {
         } else if (ACTION_REBOOTED.equals(action)) {
             mRatchet.increase();
         } else if (ACTION_TIMEOUT.equals(action)) {
+            mRatchet.increase();
+        } else if (ACTION_SIM_REMOVED.equals(action)) {
             mRatchet.increase();
         } else if (ACTION_PASSWORD_FAIL.equals(action)) {
             mRatchet.increase();

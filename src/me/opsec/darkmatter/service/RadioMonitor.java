@@ -21,9 +21,11 @@ public class RadioMonitor extends Service {
     private PhoneStateListener mPhoneListener = new PhoneStateListener() {
 
         public void onServiceStateChanged(ServiceState serviceState) {
+            checkSIMStateChanged();
+
             if (serviceState.getState() == ServiceState.STATE_OUT_OF_SERVICE) {
                 mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-                if (mWifiManager.isWifiEnabled() == true) {
+                if (mWifiManager.isWifiEnabled()) {
                     registerReceiver(mWifiReceiver, new IntentFilter(
                             WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
                     mWifiManager.startScan();
@@ -31,6 +33,17 @@ public class RadioMonitor extends Service {
                     // No wifi available
                     sendRadioLostIntent();
                 }
+            }
+        }
+
+        private void checkSIMStateChanged() {
+            TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+
+            if (tm.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
+            	return;
+            }
+            if (tm.getSimState() == TelephonyManager.SIM_STATE_ABSENT) {
+                sendSIMRemovedIntent();
             }
         }
     };
@@ -51,6 +64,12 @@ public class RadioMonitor extends Service {
     private void sendRadioLostIntent() {
         Intent intent = new Intent(RadioMonitor.this, DarkService.class);
         intent.setAction(DarkService.ACTION_RADIO_LOST);
+        startService(intent);
+    }
+
+    private void sendSIMRemovedIntent() {
+        Intent intent = new Intent(RadioMonitor.this, DarkService.class);
+        intent.setAction(DarkService.ACTION_SIM_REMOVED);
         startService(intent);
     }
 
